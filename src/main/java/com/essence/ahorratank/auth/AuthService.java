@@ -42,7 +42,7 @@ public class AuthService {
             throw new RuntimeException("Ya existe un usuario con ese correo");
         }
 
-        RoleEntity userRole = this.roleRepository.findByName("ROLE_USER")
+        RoleEntity userRole = this.roleRepository.findByName("USER")
                 .orElseThrow(() -> new RuntimeException("Rol ROLE_USER no encontrado"));
 
         UserEntity user = UserEntity.builder()
