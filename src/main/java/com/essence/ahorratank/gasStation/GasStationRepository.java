@@ -18,19 +18,19 @@ public interface GasStationRepository extends JpaRepository<GasStationEntity, Lo
 
     // Consulta principal con filtros dinámicos
     @Query("""
-        SELECT DISTINCT gs FROM GasStationEntity gs
-        JOIN gs.fuels f
-        WHERE gs.isActive = true
-          AND (:zone     IS NULL OR LOWER(gs.zone) = LOWER(:zone))
-          AND (:fuelType IS NULL OR f.fuelType = :fuelType)
-          AND (:maxPrice IS NULL OR f.pricePerGallon <= :maxPrice)
-          AND (:availableOnly = false OR f.isAvailable = true)
-        ORDER BY gs.name ASC
-        """)
+    SELECT DISTINCT gs FROM GasStationEntity gs
+    JOIN gs.fuels f
+    WHERE gs.isActive = true
+      AND (:zone IS NULL OR LOWER(gs.zone) = LOWER(CAST(:zone AS string)))
+      AND (:fuelType IS NULL OR f.fuelType = :fuelType)
+      AND (:maxPrice IS NULL OR f.pricePerGallon <= :maxPrice)
+      AND (:availableOnly = false OR f.isAvailable = true)
+    ORDER BY gs.name ASC
+    """)
     List<GasStationEntity> findWithFilters(
             @Param("zone")          String zone,
-            @Param("fuelType") FuelType fuelType,
-            @Param("maxPrice") BigDecimal maxPrice,
+            @Param("fuelType")      FuelType fuelType,
+            @Param("maxPrice")      BigDecimal maxPrice,
             @Param("availableOnly") boolean availableOnly
     );
 

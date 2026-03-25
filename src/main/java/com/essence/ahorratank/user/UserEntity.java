@@ -1,5 +1,6 @@
 package com.essence.ahorratank.user;
 
+import com.essence.ahorratank.gasStation.GasStationEntity;
 import com.essence.ahorratank.role.RoleEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -44,9 +45,13 @@ public class UserEntity implements UserDetails {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "role_id", nullable = false)
     private RoleEntity role;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "gas_station_id")
+    private GasStationEntity gasStation;  // null para USER, obligatorio para OPERATOR
 
     @PrePersist
     public void prePersist() {

@@ -7,7 +7,6 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -21,30 +20,56 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
     private final JwtFilter jwtFilter;
     private final AuthenticationProvider authenticationProvider;
-    private static final String[] PUBLIC_ENDPOINTS = new String[]{"/auth/**", "/users/register", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**"};
+
+    private static final String[] PUBLIC_ENDPOINTS = {
+            "/auth/**",
+            "/users/register",
+            "/v3/api-docs/**",
+            "/swagger-ui.html",
+            "/swagger-ui/**"
+    };
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf((csrf) -> csrf.disable()).authorizeHttpRequests((auth) -> ((AuthorizeHttpRequestsConfigurer.AuthorizedUrl)((AuthorizeHttpRequestsConfigurer.AuthorizedUrl)auth.requestMatchers(PUBLIC_ENDPOINTS)).permitAll().anyRequest()).authenticated()).sessionManagement((sess) -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)).authenticationProvider(this.authenticationProvider).addFilterBefore(this.jwtFilter, UsernamePasswordAuthenticationFilter.class);
-        return (SecurityFilterChain)httpSecurity.build();
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .sessionManagement(sess -> sess
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://10.0.2.2:5173", "http://localhost:5173"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "http://10.0.2.2:5173"
+        ));
+        config.setAllowedMethods(List.of(
+                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
+        ));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
     }
 
     @Generated
-    public SecurityConfig(final JwtFilter jwtFilter, final AuthenticationProvider authenticationProvider) {
+    public SecurityConfig(JwtFilter jwtFilter, AuthenticationProvider authenticationProvider) {
         this.jwtFilter = jwtFilter;
         this.authenticationProvider = authenticationProvider;
     }
