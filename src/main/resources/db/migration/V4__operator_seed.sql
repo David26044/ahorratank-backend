@@ -9,11 +9,3 @@ VALUES (
            (SELECT id FROM roles WHERE name = 'OPERATOR'),
            (SELECT id FROM gas_station WHERE name = 'Terpel Autopista Norte' LIMIT 1)
     );
-
--- ── Inventario inicial para esa estación ─────────────────────
-INSERT INTO inventory (gas_station_id, fuel_type, quantity_gallons)
-VALUES
-    ((SELECT id FROM gas_station WHERE name = 'Terpel Autopista Norte' LIMIT 1), 'REGULAR', 450.00),
-    ((SELECT id FROM gas_station WHERE name = 'Terpel Autopista Norte' LIMIT 1), 'PREMIUM', 280.00),
-    ((SELECT id FROM gas_station WHERE name = 'Terpel Autopista Norte' LIMIT 1), 'DIESEL',  320.00),
-    ((SELECT id FROM gas_station WHERE name = 'Terpel Autopista Norte' LIMIT 1), 'GAS',      80.00);

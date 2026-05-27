@@ -2,6 +2,9 @@ package com.essence.ahorratank.seeder;
 
 import com.essence.ahorratank.fuel.FuelPriceEntity;
 import com.essence.ahorratank.gasStation.GasStationEntity;
+import com.essence.ahorratank.inventory.InventoryEntity;
+import com.essence.ahorratank.role.RoleEntity;
+import com.essence.ahorratank.user.UserEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -21,17 +24,22 @@ import static com.essence.ahorratank.fuel.FuelType.*;
 public class DataSeeder implements ApplicationRunner {
 
     private final com.essence.ahorratank.gasStation.GasStationRepository stationRepository;
+    private final com.essence.ahorratank.role.RoleRepository roleRepository;
+    private final com.essence.ahorratank.user.UserRepository userRepository;
+    private final com.essence.ahorratank.inventory.InventoryRepository inventoryRepository;
 
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
         if (stationRepository.count() > 0) {
             log.info("DataSeeder: datos existentes, omitiendo seed.");
+            seedOperatorAndInventory();
             return;
         }
         log.info("DataSeeder: insertando estaciones...");
         stationRepository.saveAll(buildStations());
         log.info("DataSeeder: {} estaciones insertadas.", stationRepository.count());
+        seedOperatorAndInventory();
     }
 
     private List<GasStationEntity> buildStations() {
@@ -304,8 +312,150 @@ public class DataSeeder implements ApplicationRunner {
             station("Terpel Portal 80",
                     "Calle 80 # 111-40, Bogotá",
                     4.714800, -74.127600, "Engativá",
-                    fuel(REGULAR, "15070"), fuel(DIESEL, "10950"), fuel(GAS, "3140"))
+                    fuel(REGULAR, "15070"), fuel(DIESEL, "10950"), fuel(GAS, "3140")),
+
+            // ── MUESTRA SICOM / DATOS ABIERTOS 2022-02 ───────────────────────────
+            station("Super Estacion de Servicio Texaco 10",
+                    "Avenida Carrera 7 # 123A-48, Bogotá",
+                    4.699900, -74.030600, "Usaquén",
+                    fuel(REGULAR, "9860"), fuel(PREMIUM, "17250"), fuel(DIESEL, "9780")),
+
+            station("Biomax Inverniza",
+                    "Transversal 73A # 82H-55, Bogotá",
+                    4.707300, -74.088600, "Engativá",
+                    fuel(REGULAR, "9095"), fuel(DIESEL, "8795")),
+
+            station("Brio Bima",
+                    "Avenida Autopista Norte 45 # 232-35, Bogotá",
+                    4.802900, -74.043000, "Usaquén",
+                    fuel(REGULAR, "9380"), fuel(PREMIUM, "16290"), fuel(DIESEL, "9260")),
+
+            station("Brio Gas",
+                    "Calle 146A # 95-59, Bogotá",
+                    4.745500, -74.102800, "Suba",
+                    fuel(REGULAR, "9247"), fuel(PREMIUM, "11200"), fuel(DIESEL, "9351")),
+
+            station("Combustibles Pegaso",
+                    "Carrera 7 # 70-31, Bogotá",
+                    4.652800, -74.054300, "Chapinero",
+                    fuel(REGULAR, "9370"), fuel(PREMIUM, "16370")),
+
+            station("Combustibles Venecia",
+                    "Avenida Carrera 68 # 43-67 Sur, Bogotá",
+                    4.594900, -74.133700, "Tunjuelito",
+                    fuel(REGULAR, "8760"), fuel(DIESEL, "8690")),
+
+            station("Portal de Alamos",
+                    "Carrera 98 # 63-39, Bogotá",
+                    4.699500, -74.121900, "Engativá",
+                    fuel(REGULAR, "9069"), fuel(PREMIUM, "15829"), fuel(DIESEL, "8929")),
+
+            station("Combustibles y Servicios Timiza",
+                    "Carrera 73 # 36A-55 Sur, Bogotá",
+                    4.612400, -74.153500, "Kennedy",
+                    fuel(REGULAR, "9176"), fuel(DIESEL, "8946")),
+
+            station("Distribuidora Esso Versalles",
+                    "Carrera 107 # 23-46, Bogotá",
+                    4.673700, -74.153700, "Fontibón",
+                    fuel(REGULAR, "9372"), fuel(DIESEL, "9152")),
+
+            station("EDS Biomax 7 de Agosto",
+                    "Avenida Calle 68 # 19-84, Bogotá",
+                    4.662300, -74.062100, "Barrios Unidos",
+                    fuel(REGULAR, "9105"), fuel(DIESEL, "9165")),
+
+            station("EDS Biomax Calle 13",
+                    "Carrera 88 # 17-09, Bogotá",
+                    4.658900, -74.136100, "Fontibón",
+                    fuel(REGULAR, "9380"), fuel(DIESEL, "9240")),
+
+            station("EDS Biomax Colina",
+                    "Avenida Carrera 72 # 132A-27, Bogotá",
+                    4.727900, -74.072700, "Suba",
+                    fuel(REGULAR, "9380"), fuel(PREMIUM, "16510"), fuel(DIESEL, "9260")),
+
+            station("EDS Biomax Orquideas",
+                    "Calle 161 # 18-30, Bogotá",
+                    4.742200, -74.036500, "Usaquén",
+                    fuel(REGULAR, "9122"), fuel(DIESEL, "9369")),
+
+            station("EDS Biomax Tintal",
+                    "Avenida Calle 54 Sur # 89A-55, Bogotá",
+                    4.596400, -74.169200, "Kennedy",
+                    fuel(REGULAR, "9475"), fuel(DIESEL, "9147")),
+
+            station("EDS Brio Barrio Colombia",
+                    "Carrera 24 # 71A-68, Bogotá",
+                    4.660100, -74.066700, "Barrios Unidos",
+                    fuel(REGULAR, "9350"), fuel(PREMIUM, "15890"), fuel(DIESEL, "9360")),
+
+            station("EDS Buenos Aires",
+                    "Calle 1 # 2A-51, Bogotá",
+                    4.584700, -74.073200, "Santa Fe",
+                    fuel(REGULAR, "9161"), fuel(PREMIUM, "16238"), fuel(DIESEL, "8852")),
+
+            station("EDS Calle 80",
+                    "Calle 80 # 69Q-50, Bogotá",
+                    4.692400, -74.085800, "Engativá",
+                    fuel(REGULAR, "8970")),
+
+            station("EDS Ciudad de Cali",
+                    "Transversal 85 # 65-43, Bogotá",
+                    4.699100, -74.107600, "Engativá",
+                    fuel(REGULAR, "9500"), fuel(PREMIUM, "16400"), fuel(DIESEL, "9250")),
+
+            station("EDS Coesco Paralela 118",
+                    "Avenida Carrera 45 Autopista Norte # 118-54, Bogotá",
+                    4.694900, -74.056300, "Usaquén",
+                    fuel(REGULAR, "9590"), fuel(PREMIUM, "16690"), fuel(DIESEL, "10290")),
+
+            station("EDS Esso Ciudad Salitre",
+                    "Calle 22C # 68D-20, Bogotá",
+                    4.647800, -74.107800, "Fontibón",
+                    fuel(REGULAR, "9370"), fuel(PREMIUM, "17130"), fuel(DIESEL, "9260"))
         );
+    }
+
+    private void seedOperatorAndInventory() {
+        RoleEntity operatorRole = roleRepository.findByName("OPERATOR")
+                .orElseThrow(() -> new IllegalStateException("Rol OPERATOR no existe"));
+
+        GasStationEntity station = stationRepository.findAll().stream()
+                .filter(s -> "Terpel Autopista Norte".equals(s.getName()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Estación base de operador no existe"));
+
+        if (!userRepository.existsByEmail("operador@test.com")) {
+            UserEntity operator = UserEntity.builder()
+                    .firstName("Carlos")
+                    .lastName("Operador")
+                    .email("operador@test.com")
+                    .password("$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lbiW")
+                    .enabled(true)
+                    .role(operatorRole)
+                    .gasStation(station)
+                    .build();
+            userRepository.save(operator);
+        }
+
+        seedInventory(station, REGULAR, "450.00");
+        seedInventory(station, PREMIUM, "280.00");
+        seedInventory(station, DIESEL, "320.00");
+        seedInventory(station, GAS, "80.00");
+    }
+
+    private void seedInventory(GasStationEntity station, com.essence.ahorratank.fuel.FuelType fuelType, String gallons) {
+        boolean exists = inventoryRepository.findByGasStationIdAndFuelType(station.getId(), fuelType).isPresent();
+        if (exists) {
+            return;
+        }
+
+        InventoryEntity inventory = new InventoryEntity();
+        inventory.setGasStation(station);
+        inventory.setFuelType(fuelType);
+        inventory.setQuantityGallons(new BigDecimal(gallons));
+        inventoryRepository.save(inventory);
     }
 
     // ── helpers ────────────────────────────────────────────────────────────────
