@@ -1,9 +1,8 @@
 services:
   - type: web
     name: ahorra-tank-api
-    env: java
-    buildCommand: ./mvnw -DskipTests package
-    startCommand: java -jar target/ahorra-tank-0.0.1-SNAPSHOT.jar
+    env: docker
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: SERVER_SERVLET_CONTEXT_PATH
         value: /system/api
