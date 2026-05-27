@@ -17,4 +17,8 @@ public interface InventoryRepository extends JpaRepository<InventoryEntity, Long
     Optional<InventoryEntity> findByGasStationIdAndFuelType(
             Long gasStationId, FuelType fuelType
     );
+
+    List<InventoryEntity> findAllByGasStationIdAndFuelType(
+            Long gasStationId, FuelType fuelType
+    );
 }

@@ -10,14 +10,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
 public class JwtService {
-    private static final String SECRET_KEY = "95967fb15ab686235c2720414c15e2d2174b6bb79cf80c3a217164d63b85ef15";
+    private final String secretKey;
 
-    public JwtService() {
+    public JwtService(@Value("${app.jwt.secret}") String secretKey) {
+        this.secretKey = secretKey;
     }
 
     public String generateToken(UserDetails userDetails) {
@@ -59,7 +61,7 @@ public class JwtService {
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = (byte[])Decoders.BASE64.decode("95967fb15ab686235c2720414c15e2d2174b6bb79cf80c3a217164d63b85ef15");
+        byte[] keyBytes = (byte[])Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }

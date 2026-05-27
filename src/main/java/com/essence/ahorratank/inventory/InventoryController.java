@@ -1,10 +1,15 @@
 package com.essence.ahorratank.inventory;
 
+import com.essence.ahorratank.fuel.FuelType;
 import com.essence.ahorratank.inventoryLog.InventoryLogDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -63,5 +68,30 @@ public class InventoryController {
         return ResponseEntity.ok(
                 inventoryService.getInventoryLog(userDetails.getUsername())
         );
+    }
+
+    @PreAuthorize("hasRole('OPERATOR')")
+    @GetMapping("/report")
+    public ResponseEntity<byte[]> generateInventoryReport(
+            Authentication authentication,
+            @RequestParam(required = false) FuelType fuelType
+    ) {
+        byte[] pdf = inventoryService.generateInventoryReport(authentication, fuelType);
+
+        String fileName = (fuelType == null)
+                ? "inventory-report.pdf"
+                : "inventory-report-" + fuelType.name().toLowerCase() + ".pdf";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(
+                ContentDisposition.attachment()
+                        .filename(fileName)
+                        .build()
+        );
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdf);
     }
 }
